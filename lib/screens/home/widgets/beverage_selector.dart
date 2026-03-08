@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../models/beverage.dart';
-import '../../../core/theme.dart';
 
 class BeverageSelector extends StatelessWidget {
   final String selectedId;
@@ -32,12 +31,12 @@ class BeverageSelector extends StatelessWidget {
               width: 60,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AguaTheme.primaryBlue.withValues(alpha: 0.15)
+                    ? colorScheme.primary.withValues(alpha: 0.15)
                     : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isSelected
-                      ? AguaTheme.primaryBlue
+                      ? colorScheme.primary
                       : Colors.transparent,
                   width: 2,
                 ),
@@ -49,7 +48,7 @@ class BeverageSelector extends StatelessWidget {
                     bev.icon,
                     size: 24,
                     color: isSelected
-                        ? AguaTheme.primaryBlue
+                        ? colorScheme.primary
                         : colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(height: 4),
@@ -59,7 +58,7 @@ class BeverageSelector extends StatelessWidget {
                       fontSize: 10,
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                       color: isSelected
-                          ? AguaTheme.primaryBlue
+                          ? colorScheme.primary
                           : colorScheme.onSurfaceVariant,
                     ),
                   ),

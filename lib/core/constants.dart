@@ -21,6 +21,11 @@ class SPKeys {
   static const String userWeightKg = 'water_user_weight_kg';
   static const String activityLevel = 'water_activity_level'; // 0=sedentary, 1=moderate, 2=active
   static const String goalSuggestionDismissedAt = 'water_goal_suggestion_dismissed';
+  static const String accentColorIndex = 'water_accent_color_index';
+  static const String soundEnabled = 'water_sound_enabled';
+  static const String healthConnectEnabled = 'water_health_connect_enabled';
+  static const String todayEntries = 'water_today_entries'; // JSON list
+  static const String dailyGoalMl = 'water_daily_goal_ml'; // int
 }
 
 class Defaults {

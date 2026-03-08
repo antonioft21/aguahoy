@@ -68,11 +68,11 @@ class HistoryService {
     return streak;
   }
 
-  /// Average glasses per day over the last [days] days.
-  Future<double> averageGlasses(int days) async {
+  /// Average ml per day over the last [days] days.
+  Future<double> averageMl(int days) async {
     final records = await getRecentDays(days);
     if (records.isEmpty) return 0;
-    final total = records.fold<int>(0, (sum, r) => sum + r.glasses);
+    final total = records.fold<int>(0, (sum, r) => sum + r.totalMl);
     return total / records.length;
   }
 

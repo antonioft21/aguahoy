@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme.dart';
 
 class GoalSuggestionCard extends StatelessWidget {
-  final int currentGoal;
+  final int currentGoalMl;
   final int streak;
   final VoidCallback onAccept;
   final VoidCallback onDismiss;
 
   const GoalSuggestionCard({
     super.key,
-    required this.currentGoal,
+    required this.currentGoalMl,
     required this.streak,
     required this.onAccept,
     required this.onDismiss,
@@ -18,7 +17,7 @@ class GoalSuggestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final newGoal = currentGoal + 1;
+    final newGoalMl = currentGoalMl + 250;
 
     return Container(
       width: double.infinity,
@@ -60,7 +59,7 @@ class GoalSuggestionCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Subir objetivo a $newGoal vasos?',
+            'Subir objetivo a $newGoalMl ml?',
             style: TextStyle(
               fontSize: 12,
               color: colorScheme.onSurfaceVariant,
@@ -72,9 +71,9 @@ class GoalSuggestionCard extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: onAccept,
               icon: const Icon(Icons.arrow_upward, size: 16),
-              label: Text('Subir a $newGoal vasos'),
+              label: Text('Subir a $newGoalMl ml'),
               style: FilledButton.styleFrom(
-                backgroundColor: AguaTheme.primaryBlue,
+                backgroundColor: colorScheme.primary,
                 textStyle: const TextStyle(fontSize: 13),
                 padding: const EdgeInsets.symmetric(horizontal: 16),
               ),

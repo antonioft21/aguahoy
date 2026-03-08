@@ -27,9 +27,9 @@ final streakProvider = FutureProvider<int>((ref) async {
   return service.calculateStreak(freezesAvailable: freezes);
 });
 
-/// Weekly average. Re-runs whenever water state changes.
+/// Weekly average in ml. Re-runs whenever water state changes.
 final weeklyAverageProvider = FutureProvider<double>((ref) async {
   ref.watch(waterProvider);
   final service = ref.read(historyServiceProvider);
-  return service.averageGlasses(7);
+  return service.averageMl(7);
 });

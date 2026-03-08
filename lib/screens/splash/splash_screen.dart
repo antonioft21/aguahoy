@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/theme.dart';
 
 class SplashScreen extends StatefulWidget {
   final VoidCallback onComplete;
@@ -63,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Icon(
                     Icons.water_drop,
                     size: 80,
-                    color: AguaTheme.primaryBlue,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 const SizedBox(height: 16),

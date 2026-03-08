@@ -20,3 +20,21 @@ class ThemeNotifier extends StateNotifier<bool> {
 final themeProvider = StateNotifierProvider<ThemeNotifier, bool>((ref) {
   return ThemeNotifier(ref);
 });
+
+/// Accent color index (0=blue, 1=green, etc.)
+class AccentNotifier extends StateNotifier<int> {
+  final Ref _ref;
+
+  AccentNotifier(this._ref) : super(0) {
+    state = _ref.read(storageServiceProvider).accentColorIndex;
+  }
+
+  Future<void> setIndex(int index) async {
+    state = index;
+    await _ref.read(storageServiceProvider).setAccentColorIndex(index);
+  }
+}
+
+final accentProvider = StateNotifierProvider<AccentNotifier, int>((ref) {
+  return AccentNotifier(ref);
+});

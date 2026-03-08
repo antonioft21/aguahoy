@@ -2,16 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../main.dart';
 
 class SettingsState {
-  final int dailyGoal;
-  final int glassSizeMl;
+  final int dailyGoalMl;
   final bool remindersEnabled;
   final int reminderStartHour;
   final int reminderEndHour;
   final int reminderIntervalMin;
 
   const SettingsState({
-    required this.dailyGoal,
-    required this.glassSizeMl,
+    required this.dailyGoalMl,
     required this.remindersEnabled,
     required this.reminderStartHour,
     required this.reminderEndHour,
@@ -19,16 +17,14 @@ class SettingsState {
   });
 
   SettingsState copyWith({
-    int? dailyGoal,
-    int? glassSizeMl,
+    int? dailyGoalMl,
     bool? remindersEnabled,
     int? reminderStartHour,
     int? reminderEndHour,
     int? reminderIntervalMin,
   }) {
     return SettingsState(
-      dailyGoal: dailyGoal ?? this.dailyGoal,
-      glassSizeMl: glassSizeMl ?? this.glassSizeMl,
+      dailyGoalMl: dailyGoalMl ?? this.dailyGoalMl,
       remindersEnabled: remindersEnabled ?? this.remindersEnabled,
       reminderStartHour: reminderStartHour ?? this.reminderStartHour,
       reminderEndHour: reminderEndHour ?? this.reminderEndHour,
@@ -42,8 +38,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
 
   SettingsNotifier(this._ref)
       : super(const SettingsState(
-          dailyGoal: 8,
-          glassSizeMl: 250,
+          dailyGoalMl: 2000,
           remindersEnabled: false,
           reminderStartHour: 8,
           reminderEndHour: 22,
@@ -55,8 +50,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   void _init() {
     final storage = _ref.read(storageServiceProvider);
     state = SettingsState(
-      dailyGoal: storage.dailyGoal,
-      glassSizeMl: storage.glassSizeMl,
+      dailyGoalMl: storage.dailyGoalMl,
       remindersEnabled: storage.remindersEnabled,
       reminderStartHour: storage.reminderStartHour,
       reminderEndHour: storage.reminderEndHour,
@@ -64,16 +58,10 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     );
   }
 
-  Future<void> setDailyGoal(int goal) async {
+  Future<void> setDailyGoalMl(int ml) async {
     final storage = _ref.read(storageServiceProvider);
-    state = state.copyWith(dailyGoal: goal);
-    await storage.setDailyGoal(goal);
-  }
-
-  Future<void> setGlassSizeMl(int ml) async {
-    final storage = _ref.read(storageServiceProvider);
-    state = state.copyWith(glassSizeMl: ml);
-    await storage.setGlassSizeMl(ml);
+    state = state.copyWith(dailyGoalMl: ml);
+    await storage.setDailyGoalMl(ml);
   }
 
   Future<void> setRemindersEnabled(bool enabled) async {

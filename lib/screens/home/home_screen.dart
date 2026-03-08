@@ -6,11 +6,10 @@ import '../../providers/premium_provider.dart';
 import '../../providers/rank_provider.dart';
 import '../../providers/achievements_provider.dart';
 import '../../models/achievement.dart';
-import '../../core/theme.dart';
 import '../../widgets/ad_banner_widget.dart';
 import 'widgets/progress_circle.dart';
-import 'widgets/glass_icons_row.dart';
-import 'widgets/water_button.dart';
+import 'widgets/beverage_breakdown_row.dart';
+import 'widgets/volume_presets_row.dart';
 import 'widgets/ml_label.dart';
 import 'widgets/beverage_selector.dart';
 import 'widgets/weekly_challenge_card.dart';
@@ -19,6 +18,7 @@ import '../../providers/challenge_provider.dart';
 import '../../providers/history_provider.dart';
 import '../../main.dart';
 import '../../core/constants.dart';
+import '../../services/sound_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -55,18 +55,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
   }
 
-  void _onAddGlass() async {
+  void _onAddDrink(int volumeMl) async {
     HapticFeedback.mediumImpact();
-    await ref.read(waterProvider.notifier).addGlass();
+    final soundOn = ref.read(storageServiceProvider).soundEnabled;
+    if (soundOn) SoundService.playWaterDrop();
+    await ref.read(waterProvider.notifier).addDrink(volumeMl);
 
-    // Check if goal was just met
     final water = ref.read(waterProvider);
     if (water.goalMet && !_previousGoalMet) {
       _celebrate();
     }
     _previousGoalMet = water.goalMet;
 
-    // Check achievements
     final newAchievements =
         await ref.read(achievementsProvider.notifier).checkAll();
     if (newAchievements.isNotEmpty && mounted) {
@@ -101,7 +101,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final water = ref.watch(waterProvider);
     final isPremium = ref.watch(premiumProvider);
 
-    // Keep tracking goal state for celebration detection
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _previousGoalMet = water.goalMet;
     });
@@ -156,17 +155,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         const SizedBox(height: 8),
                         // Rank badge
                         ref.watch(rankProvider).when(
+                          skipLoadingOnReload: true,
                           data: (rank) => Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(rank.icon, size: 16, color: AguaTheme.primaryBlue),
+                              Icon(rank.icon, size: 16, color: Theme.of(context).colorScheme.primary),
                               const SizedBox(width: 6),
                               Text(
                                 rank.title,
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
-                                  color: AguaTheme.primaryBlue,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                             ],
@@ -175,9 +175,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           error: (_, __) => const SizedBox.shrink(),
                         ),
                         const SizedBox(height: 16),
-                        GlassIconsRow(
-                          filled: water.currentCount,
-                          total: water.dailyGoal,
+                        BeverageBreakdownRow(
+                          mlByBeverage: water.mlByBeverage,
                         ),
                         const SizedBox(height: 20),
                         BeverageSelector(
@@ -187,54 +186,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           },
                         ),
                         const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            WaterButton(
-                              icon: Icons.remove,
-                              onPressed: water.currentCount > 0
-                                  ? () {
-                                      HapticFeedback.lightImpact();
-                                      ref
-                                          .read(waterProvider.notifier)
-                                          .removeGlass();
-                                    }
-                                  : null,
-                            ),
-                            const SizedBox(width: 32),
-                            WaterButton(
-                              icon: Icons.add,
-                              isPrimary: true,
-                              onPressed: _onAddGlass,
-                            ),
-                          ],
+                        VolumePresetsRow(
+                          onAddDrink: _onAddDrink,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          '${water.glassSizeMl} ml por vaso',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  ),
+                        const SizedBox(height: 12),
+                        // Undo button
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 200),
+                          child: water.entries.isNotEmpty
+                              ? TextButton.icon(
+                                  onPressed: () {
+                                    HapticFeedback.lightImpact();
+                                    ref.read(waterProvider.notifier).undoLast();
+                                  },
+                                  icon: const Icon(Icons.undo, size: 18),
+                                  label: const Text('Deshacer'),
+                                )
+                              : const SizedBox.shrink(),
                         ),
                         const SizedBox(height: 16),
                         // Goal suggestion (if streak >= 7)
                         if (!_goalSuggestionDismissed)
                           ref.watch(streakProvider).when(
+                            skipLoadingOnReload: true,
                             data: (streak) {
                               if (streak < 7) return const SizedBox.shrink();
-                              // Check if already dismissed recently
                               final storage = ref.read(storageServiceProvider);
                               final dismissed = storage.getBool(SPKeys.goalSuggestionDismissedAt);
                               if (dismissed == true) return const SizedBox.shrink();
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 12),
                                 child: GoalSuggestionCard(
-                                  currentGoal: water.dailyGoal,
+                                  currentGoalMl: water.goalMl,
                                   streak: streak,
                                   onAccept: () {
-                                    final newGoal = water.dailyGoal + 1;
-                                    ref.read(waterProvider.notifier).setGoal(newGoal);
+                                    final newGoalMl = water.goalMl + 250;
+                                    ref.read(waterProvider.notifier).setGoalMl(newGoalMl);
                                     storage.setBool(SPKeys.goalSuggestionDismissedAt, true);
                                     setState(() => _goalSuggestionDismissed = true);
                                   },
@@ -250,6 +237,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           ),
                         // Weekly challenge
                         ref.watch(challengeProvider).when(
+                          skipLoadingOnReload: true,
                           data: (state) =>
                               WeeklyChallengeCard(challengeState: state),
                           loading: () => const SizedBox.shrink(),

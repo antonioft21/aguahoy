@@ -21,13 +21,15 @@ class DayRecordAdapter extends TypeAdapter<DayRecord> {
       glasses: (fields[1] as num).toInt(),
       goalGlasses: (fields[2] as num).toInt(),
       glassSizeMl: (fields[3] as num).toInt(),
+      totalMlDirect: fields[4] == null ? null : (fields[4] as num).toInt(),
+      goalMlDirect: fields[5] == null ? null : (fields[5] as num).toInt(),
     );
   }
 
   @override
   void write(BinaryWriter writer, DayRecord obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.dateKey)
       ..writeByte(1)
@@ -35,7 +37,11 @@ class DayRecordAdapter extends TypeAdapter<DayRecord> {
       ..writeByte(2)
       ..write(obj.goalGlasses)
       ..writeByte(3)
-      ..write(obj.glassSizeMl);
+      ..write(obj.glassSizeMl)
+      ..writeByte(4)
+      ..write(obj.totalMlDirect)
+      ..writeByte(5)
+      ..write(obj.goalMlDirect);
   }
 
   @override

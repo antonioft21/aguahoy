@@ -64,7 +64,7 @@ class HistoryScreen extends ConsumerWidget {
                   child: avgAsync.when(
                     data: (avg) => StatsCard(
                       label: 'Media 7d',
-                      value: '${avg.toStringAsFixed(1)} vasos',
+                      value: '${avg.round()} ml',
                       icon: Icons.trending_up,
                     ),
                     loading: () => const StatsCard(

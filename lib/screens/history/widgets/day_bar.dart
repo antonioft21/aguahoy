@@ -11,7 +11,7 @@ class DayBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final barColor =
-        record.goalMet ? AguaTheme.successGreen : AguaTheme.primaryBlue;
+        record.goalMet ? AguaTheme.successGreen : Theme.of(context).colorScheme.primary;
     final isToday = record.dateKey == AppDateUtils.todayKey();
 
     return Card(
@@ -26,7 +26,7 @@ class DayBar extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
-                  color: isToday ? AguaTheme.primaryBlue : Theme.of(context).colorScheme.onSurface,
+                  color: isToday ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -44,11 +44,12 @@ class DayBar extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             SizedBox(
-              width: 48,
+              width: 80,
               child: Text(
-                '${record.glasses}/${record.goalGlasses}',
+                '${record.totalMl}/${record.goalMl}',
                 textAlign: TextAlign.center,
                 style: TextStyle(
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: barColor,
                 ),

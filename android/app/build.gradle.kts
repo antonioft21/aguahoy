@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         applicationId = "com.aguahoy.aguahoy"
-        minSdk = flutter.minSdkVersion
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

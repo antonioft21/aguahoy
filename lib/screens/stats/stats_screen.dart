@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import '../../providers/stats_provider.dart';
+import '../../providers/history_provider.dart';
+import '../../services/export_service.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -19,6 +21,25 @@ class StatsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Estadisticas'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.file_download),
+            tooltip: 'Exportar CSV',
+            onPressed: () async {
+              final service = ref.read(historyServiceProvider);
+              final records = await service.getAllRecords();
+              if (records.isEmpty) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('No hay datos para exportar')),
+                  );
+                }
+                return;
+              }
+              await ExportService.exportCsv(records);
+            },
+          ),
+        ],
       ),
       body: statsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -33,14 +54,14 @@ class StatsScreen extends ConsumerWidget {
                   icon: Icons.water_drop,
                   value: '${stats.totalLiters} L',
                   label: 'Total bebido',
-                  color: AguaTheme.primaryBlue,
+                  color: colorScheme.primary,
                 ),
                 const SizedBox(width: 12),
                 _StatTile(
                   icon: Icons.local_drink,
                   value: '${stats.totalGlasses}',
-                  label: 'Total vasos',
-                  color: AguaTheme.primaryBlue,
+                  label: 'Total registros',
+                  color: colorScheme.primary,
                 ),
               ],
             ),
@@ -51,7 +72,7 @@ class StatsScreen extends ConsumerWidget {
                   icon: Icons.calendar_today,
                   value: '${stats.daysTracked}',
                   label: 'Dias registrados',
-                  color: AguaTheme.primaryBlue,
+                  color: colorScheme.primary,
                 ),
                 const SizedBox(width: 12),
                 _StatTile(
@@ -81,7 +102,7 @@ class StatsScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${stats.bestDay!.glasses} vasos (${stats.bestDay!.totalMl} ml)',
+                              '${stats.bestDay!.totalMl} ml',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -115,10 +136,10 @@ class StatsScreen extends ConsumerWidget {
                 child: Row(
                   children: [
                     Icon(Icons.trending_up,
-                        color: AguaTheme.primaryBlue, size: 32),
+                        color: colorScheme.primary, size: 32),
                     const SizedBox(width: 16),
                     Text(
-                      '${stats.avgGlasses30d.toStringAsFixed(1)} vasos/dia',
+                      '${stats.avgMl30d} ml/dia',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -132,7 +153,7 @@ class StatsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Monthly chart
-            if (stats.monthlyAvg.isNotEmpty) ...[
+            if (stats.monthlyAvgMl.isNotEmpty) ...[
               _SectionTitle(text: 'Media mensual (${DateTime.now().year})'),
               const SizedBox(height: 8),
               Card(
@@ -141,7 +162,7 @@ class StatsScreen extends ConsumerWidget {
                   child: SizedBox(
                     height: 160,
                     child: _MonthlyChart(
-                      monthlyAvg: stats.monthlyAvg,
+                      monthlyAvgMl: stats.monthlyAvgMl,
                       colorScheme: colorScheme,
                     ),
                   ),
@@ -229,11 +250,11 @@ class _StatTile extends StatelessWidget {
 }
 
 class _MonthlyChart extends StatelessWidget {
-  final Map<int, double> monthlyAvg;
+  final Map<int, int> monthlyAvgMl;
   final ColorScheme colorScheme;
 
   const _MonthlyChart({
-    required this.monthlyAvg,
+    required this.monthlyAvgMl,
     required this.colorScheme,
   });
 
@@ -244,15 +265,15 @@ class _MonthlyChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxVal = monthlyAvg.values.fold<double>(1, (a, b) => a > b ? a : b);
+    final maxVal = monthlyAvgMl.values.fold<int>(1, (a, b) => a > b ? a : b);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: List.generate(12, (i) {
         final month = i + 1;
-        final avg = monthlyAvg[month] ?? 0;
+        final avg = monthlyAvgMl[month] ?? 0;
         final barHeight = maxVal > 0 ? (avg / maxVal) * 120 : 0.0;
-        final hasData = monthlyAvg.containsKey(month);
+        final hasData = monthlyAvgMl.containsKey(month);
 
         return Expanded(
           child: Column(
@@ -260,7 +281,7 @@ class _MonthlyChart extends StatelessWidget {
             children: [
               if (hasData)
                 Text(
-                  avg.toStringAsFixed(1),
+                  avg.toString(),
                   style: TextStyle(
                     fontSize: 8,
                     color: colorScheme.onSurfaceVariant,
@@ -272,7 +293,7 @@ class _MonthlyChart extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 2),
                 decoration: BoxDecoration(
                   color: hasData
-                      ? AguaTheme.primaryBlue
+                      ? colorScheme.primary
                       : colorScheme.onSurfaceVariant.withValues(alpha: 0.1),
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(4)),

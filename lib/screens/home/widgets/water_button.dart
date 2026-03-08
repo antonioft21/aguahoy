@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme.dart';
 
 class WaterButton extends StatefulWidget {
   final IconData icon;
@@ -63,9 +62,9 @@ class _WaterButtonState extends State<WaterButton>
             shape: const CircleBorder(),
             padding: EdgeInsets.zero,
             backgroundColor:
-                widget.isPrimary ? AguaTheme.primaryBlue : Theme.of(context).cardTheme.color,
+                widget.isPrimary ? Theme.of(context).colorScheme.primary : Theme.of(context).cardTheme.color,
             foregroundColor:
-                widget.isPrimary ? Colors.white : AguaTheme.primaryBlue,
+                widget.isPrimary ? Colors.white : Theme.of(context).colorScheme.primary,
             elevation: widget.isPrimary ? 4 : 1,
             disabledBackgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
             disabledForegroundColor: Theme.of(context).colorScheme.onSurfaceVariant,

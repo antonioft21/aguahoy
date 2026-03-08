@@ -59,11 +59,11 @@ class AchievementsNotifier extends StateNotifier<Map<String, String>> {
       if (await _unlock('goal_met')) newlyUnlocked.add('goal_met');
     }
 
-    if (water.currentCount >= water.dailyGoal * 2) {
+    if (water.effectiveHydrationMl >= water.goalMl * 2) {
       if (await _unlock('double_goal')) newlyUnlocked.add('double_goal');
     }
 
-    if (water.currentMl >= 1000) {
+    if (water.effectiveHydrationMl >= 1000) {
       if (await _unlock('liter')) newlyUnlocked.add('liter');
     }
 

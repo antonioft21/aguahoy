@@ -17,6 +17,7 @@ void main() {
       SPKeys.currentCount: 0,
       SPKeys.dailyGoal: 8,
       SPKeys.glassSizeMl: 250,
+      SPKeys.dailyGoalMl: 2000,
       SPKeys.lastResetDate:
           '${DateTime.now().year.toString().padLeft(4, '0')}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}',
     });
@@ -34,45 +35,44 @@ void main() {
     container.dispose();
   });
 
-  test('initial state has count 0, goal 8, glass 250ml', () {
+  test('initial state has count 0, goalMl 2000', () {
     final state = container.read(waterProvider);
     expect(state.currentCount, 0);
-    expect(state.dailyGoal, 8);
-    expect(state.glassSizeMl, 250);
+    expect(state.goalMl, 2000);
   });
 
-  test('addGlass increments count', () async {
-    await container.read(waterProvider.notifier).addGlass();
+  test('addDrink increments count and ml', () async {
+    await container.read(waterProvider.notifier).addDrink(250);
     final state = container.read(waterProvider);
     expect(state.currentCount, 1);
-    expect(state.currentMl, 250);
+    expect(state.effectiveHydrationMl, 250);
   });
 
-  test('removeGlass decrements count', () async {
-    await container.read(waterProvider.notifier).addGlass();
-    await container.read(waterProvider.notifier).addGlass();
-    await container.read(waterProvider.notifier).removeGlass();
+  test('undoLast removes last entry', () async {
+    await container.read(waterProvider.notifier).addDrink(250);
+    await container.read(waterProvider.notifier).addDrink(250);
+    await container.read(waterProvider.notifier).undoLast();
     expect(container.read(waterProvider).currentCount, 1);
   });
 
-  test('removeGlass does not go below 0', () async {
-    await container.read(waterProvider.notifier).removeGlass();
+  test('undoLast does nothing when empty', () async {
+    await container.read(waterProvider.notifier).undoLast();
     expect(container.read(waterProvider).currentCount, 0);
   });
 
   test('progress calculates correctly', () async {
-    // Add 4 glasses out of 8 = 50%
+    // Add 1000ml out of 2000 = 50%
     for (var i = 0; i < 4; i++) {
-      await container.read(waterProvider.notifier).addGlass();
+      await container.read(waterProvider.notifier).addDrink(250);
     }
     final state = container.read(waterProvider);
     expect(state.progress, 0.5);
     expect(state.goalMet, false);
   });
 
-  test('goalMet is true when count >= goal', () async {
+  test('goalMet is true when effectiveMl >= goalMl', () async {
     for (var i = 0; i < 8; i++) {
-      await container.read(waterProvider.notifier).addGlass();
+      await container.read(waterProvider.notifier).addDrink(250);
     }
     expect(container.read(waterProvider).goalMet, true);
     expect(container.read(waterProvider).progress, 1.0);
@@ -80,20 +80,14 @@ void main() {
 
   test('progress clamps at 1.0 when exceeding goal', () async {
     for (var i = 0; i < 10; i++) {
-      await container.read(waterProvider.notifier).addGlass();
+      await container.read(waterProvider.notifier).addDrink(250);
     }
     expect(container.read(waterProvider).progress, 1.0);
   });
 
-  test('setGoal updates daily goal', () async {
-    await container.read(waterProvider.notifier).setGoal(10);
-    expect(container.read(waterProvider).dailyGoal, 10);
+  test('setGoalMl updates goal', () async {
+    await container.read(waterProvider.notifier).setGoalMl(2500);
     expect(container.read(waterProvider).goalMl, 2500);
-  });
-
-  test('setGlassSize updates glass size', () async {
-    await container.read(waterProvider.notifier).setGlassSize(300);
-    expect(container.read(waterProvider).glassSizeMl, 300);
   });
 
   test('daily reset when lastResetDate is yesterday', () async {
@@ -105,6 +99,7 @@ void main() {
       SPKeys.currentCount: 5,
       SPKeys.dailyGoal: 8,
       SPKeys.glassSizeMl: 250,
+      SPKeys.dailyGoalMl: 2000,
       SPKeys.lastResetDate: yesterdayKey,
     });
     final prefs = await SharedPreferences.getInstance();
@@ -129,5 +124,12 @@ void main() {
 
     await container.read(waterProvider.notifier).reconcileFromWidget();
     expect(container.read(waterProvider).currentCount, 3);
+  });
+
+  test('mlByBeverage provides correct breakdown', () async {
+    await container.read(waterProvider.notifier).addDrink(250);
+    await container.read(waterProvider.notifier).addDrink(500);
+    final state = container.read(waterProvider);
+    expect(state.mlByBeverage['water'], 750);
   });
 }

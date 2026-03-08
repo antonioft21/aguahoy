@@ -17,6 +17,7 @@ void main() {
       SPKeys.currentCount: 0,
       SPKeys.dailyGoal: 8,
       SPKeys.glassSizeMl: 250,
+      SPKeys.dailyGoalMl: 2000,
       SPKeys.lastResetDate:
           '${DateTime.now().year.toString().padLeft(4, '0')}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}',
     });
@@ -30,7 +31,7 @@ void main() {
         storageServiceProvider.overrideWithValue(storageService),
       ],
       child: MaterialApp(
-        theme: AguaTheme.lightTheme,
+        theme: AguaTheme.lightTheme(),
         home: const HomeScreen(),
       ),
     );
@@ -53,12 +54,13 @@ void main() {
     expect(find.text('0%'), findsOneWidget);
   });
 
-  testWidgets('tapping + adds a glass and updates MlLabel', (tester) async {
+  testWidgets('tapping Vaso preset adds drink and updates MlLabel', (tester) async {
     await tester.pumpWidget(createTestApp());
     await tester.pumpAndSettle();
 
-    final addButton = find.byIcon(Icons.add);
-    await tester.tap(addButton);
+    // Find the "Vaso" preset button text and tap it
+    final vasoButton = find.text('Vaso\n250ml');
+    await tester.tap(vasoButton);
     await tester.pumpAndSettle();
 
     final mlLabel = tester.widget<MlLabel>(find.byType(MlLabel));

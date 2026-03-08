@@ -34,6 +34,16 @@ dependencies:
   # UI
   percent_indicator: ^4.2.3
 
+  # Sharing & files
+  share_plus: ^10.1.4
+  path_provider: ^2.1.5
+
+  # Audio
+  just_audio: ^0.9.43
+
+  # Health
+  health: ^12.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -49,3 +59,5 @@ flutter_launcher_icons:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/sounds/

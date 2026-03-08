@@ -16,15 +16,23 @@ class DayRecord extends HiveObject {
   @HiveField(3)
   final int glassSizeMl;
 
+  @HiveField(4)
+  final int? totalMlDirect; // ml efectivos totales del dia
+
+  @HiveField(5)
+  final int? goalMlDirect; // meta en ml
+
   DayRecord({
     required this.dateKey,
     required this.glasses,
     required this.goalGlasses,
     required this.glassSizeMl,
+    this.totalMlDirect,
+    this.goalMlDirect,
   });
 
-  int get totalMl => glasses * glassSizeMl;
-  int get goalMl => goalGlasses * glassSizeMl;
-  double get progress => goalGlasses > 0 ? (glasses / goalGlasses).clamp(0.0, 1.0) : 0.0;
-  bool get goalMet => glasses >= goalGlasses;
+  int get totalMl => totalMlDirect ?? (glasses * glassSizeMl);
+  int get goalMl => goalMlDirect ?? (goalGlasses * glassSizeMl);
+  double get progress => goalMl > 0 ? (totalMl / goalMl).clamp(0.0, 1.0) : 0.0;
+  bool get goalMet => totalMl >= goalMl;
 }

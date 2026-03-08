@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme.dart';
 
 class GoalPicker extends StatelessWidget {
   final String label;
@@ -43,7 +42,7 @@ class GoalPicker extends StatelessWidget {
                       ? () => onChanged(value - step)
                       : null,
                   icon: const Icon(Icons.remove_circle_outline),
-                  color: AguaTheme.primaryBlue,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(width: 16),
                 Text(
@@ -60,7 +59,7 @@ class GoalPicker extends StatelessWidget {
                       ? () => onChanged(value + step)
                       : null,
                   icon: const Icon(Icons.add_circle_outline),
-                  color: AguaTheme.primaryBlue,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ],
             ),

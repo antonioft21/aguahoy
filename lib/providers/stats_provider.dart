@@ -9,8 +9,8 @@ class AdvancedStats {
   final int daysTracked;
   final int daysGoalMet;
   final DayRecord? bestDay;
-  final double avgGlasses30d;
-  final Map<int, double> monthlyAvg; // month (1-12) -> avg glasses
+  final int avgMl30d;
+  final Map<int, int> monthlyAvgMl; // month (1-12) -> avg ml
 
   const AdvancedStats({
     required this.totalLiters,
@@ -18,8 +18,8 @@ class AdvancedStats {
     required this.daysTracked,
     required this.daysGoalMet,
     required this.bestDay,
-    required this.avgGlasses30d,
-    required this.monthlyAvg,
+    required this.avgMl30d,
+    required this.monthlyAvgMl,
   });
 
   double get goalMetPercent =>
@@ -38,8 +38,8 @@ final advancedStatsProvider = FutureProvider<AdvancedStats>((ref) async {
       daysTracked: 0,
       daysGoalMet: 0,
       bestDay: null,
-      avgGlasses30d: 0,
-      monthlyAvg: {},
+      avgMl30d: 0,
+      monthlyAvgMl: {},
     );
   }
 
@@ -49,28 +49,28 @@ final advancedStatsProvider = FutureProvider<AdvancedStats>((ref) async {
 
   DayRecord? bestDay;
   for (final r in allRecords) {
-    if (bestDay == null || r.glasses > bestDay.glasses) {
+    if (bestDay == null || r.totalMl > bestDay.totalMl) {
       bestDay = r;
     }
   }
 
-  // 30-day average
+  // 30-day average in ml
   final recent30 = await service.getRecentDays(30);
-  final avg30 = recent30.isEmpty
-      ? 0.0
-      : recent30.fold<int>(0, (s, r) => s + r.glasses) / recent30.length;
+  final avgMl30d = recent30.isEmpty
+      ? 0
+      : (recent30.fold<int>(0, (s, r) => s + r.totalMl) / recent30.length).round();
 
-  // Monthly averages (current year)
+  // Monthly averages in ml (current year)
   final now = DateTime.now();
-  final monthlyAvg = <int, double>{};
+  final monthlyAvgMl = <int, int>{};
   for (var m = 1; m <= 12; m++) {
     final monthRecords = allRecords.where((r) {
       final d = DateTime.tryParse(r.dateKey);
       return d != null && d.year == now.year && d.month == m;
     }).toList();
     if (monthRecords.isNotEmpty) {
-      monthlyAvg[m] = monthRecords.fold<int>(0, (s, r) => s + r.glasses) /
-          monthRecords.length;
+      monthlyAvgMl[m] = (monthRecords.fold<int>(0, (s, r) => s + r.totalMl) /
+          monthRecords.length).round();
     }
   }
 
@@ -80,7 +80,7 @@ final advancedStatsProvider = FutureProvider<AdvancedStats>((ref) async {
     daysTracked: allRecords.length,
     daysGoalMet: daysGoalMet,
     bestDay: bestDay,
-    avgGlasses30d: avg30,
-    monthlyAvg: monthlyAvg,
+    avgMl30d: avgMl30d,
+    monthlyAvgMl: monthlyAvgMl,
   );
 });

@@ -27,14 +27,16 @@ class AguaHoyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = ref.watch(themeProvider);
+    final accentIndex = ref.watch(accentProvider);
     final phase = ref.watch(_appPhaseProvider);
     final onboardingDone = ref.watch(_onboardingDoneProvider);
+    final accent = AccentColors.colors[accentIndex.clamp(0, AccentColors.colors.length - 1)];
 
     return MaterialApp(
       title: 'AguaHoy',
       debugShowCheckedModeBanner: false,
-      theme: AguaTheme.lightTheme,
-      darkTheme: AguaTheme.darkTheme,
+      theme: AguaTheme.lightTheme(accent),
+      darkTheme: AguaTheme.darkTheme(accent),
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       home: _buildHome(ref, phase, onboardingDone),
       routes: {

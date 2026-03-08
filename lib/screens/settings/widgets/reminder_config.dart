@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme.dart';
 
 class ReminderConfig extends StatelessWidget {
   final bool enabled;
@@ -34,7 +33,7 @@ class ReminderConfig extends StatelessWidget {
               ),
               value: enabled,
               onChanged: onEnabledChanged,
-              activeColor: AguaTheme.primaryBlue,
+              activeColor: Theme.of(context).colorScheme.primary,
               contentPadding: EdgeInsets.zero,
             ),
             if (enabled) ...[

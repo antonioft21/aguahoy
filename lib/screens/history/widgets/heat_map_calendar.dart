@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme.dart';
 import '../../../models/day_record.dart';
 
 class HeatMapCalendar extends StatelessWidget {
@@ -37,7 +36,7 @@ class HeatMapCalendar extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.calendar_month, size: 18, color: AguaTheme.primaryBlue),
+            Icon(Icons.calendar_month, size: 18, color: colorScheme.primary),
             const SizedBox(width: 8),
             Text(
               'Calendario',
@@ -180,20 +179,20 @@ class HeatMapCalendar extends StatelessWidget {
     if (progress <= 0) {
       return colorScheme.surfaceContainerHighest.withValues(alpha: 0.5);
     } else if (progress < 0.25) {
-      return AguaTheme.primaryBlue.withValues(alpha: 0.2);
+      return colorScheme.primary.withValues(alpha: 0.2);
     } else if (progress < 0.5) {
-      return AguaTheme.primaryBlue.withValues(alpha: 0.4);
+      return colorScheme.primary.withValues(alpha: 0.4);
     } else if (progress < 0.75) {
-      return AguaTheme.primaryBlue.withValues(alpha: 0.6);
+      return colorScheme.primary.withValues(alpha: 0.6);
     } else if (progress < 1.0) {
-      return AguaTheme.primaryBlue.withValues(alpha: 0.8);
+      return colorScheme.primary.withValues(alpha: 0.8);
     } else {
-      return AguaTheme.primaryBlue;
+      return colorScheme.primary;
     }
   }
 
   String _tooltipText(String dateKey, DayRecord? record) {
     if (record == null) return '$dateKey: sin datos';
-    return '$dateKey: ${record.glasses}/${record.goalGlasses} vasos';
+    return '$dateKey: ${record.totalMl}/${record.goalMl} ml';
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme.dart';
 
 class StatsCard extends StatelessWidget {
   final String label;
@@ -21,7 +20,7 @@ class StatsCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Icon(icon, color: AguaTheme.primaryBlue, size: 28),
+            Icon(icon, color: colorScheme.primary, size: 28),
             const SizedBox(height: 8),
             Text(
               value,

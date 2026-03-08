@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme.dart';
 
 class HydrationCalculator extends StatefulWidget {
   final int? savedWeightKg;
   final int savedActivityLevel;
-  final int currentGlassSizeMl;
   final ValueChanged<int> onApplyGoal;
 
   const HydrationCalculator({
     super.key,
     this.savedWeightKg,
     required this.savedActivityLevel,
-    required this.currentGlassSizeMl,
     required this.onApplyGoal,
   });
 
@@ -36,9 +33,6 @@ class _HydrationCalculatorState extends State<HydrationCalculator> {
   int get _recommendedMl =>
       (_weightKg * _activityMlPerKg[_activityLevel]).round();
 
-  int get _recommendedGlasses =>
-      (_recommendedMl / widget.currentGlassSizeMl).ceil();
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -50,7 +44,7 @@ class _HydrationCalculatorState extends State<HydrationCalculator> {
           children: [
             Row(
               children: [
-                Icon(Icons.calculate, color: AguaTheme.primaryBlue, size: 20),
+                Icon(Icons.calculate, color: colorScheme.primary, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'Calculadora de hidratacion',
@@ -76,7 +70,7 @@ class _HydrationCalculatorState extends State<HydrationCalculator> {
               min: 30,
               max: 150,
               divisions: 120,
-              activeColor: AguaTheme.primaryBlue,
+              activeColor: colorScheme.primary,
               label: '$_weightKg kg',
               onChanged: (v) => setState(() => _weightKg = v.round()),
             ),
@@ -105,7 +99,7 @@ class _HydrationCalculatorState extends State<HydrationCalculator> {
                         style: TextStyle(fontSize: 12),
                       ),
                       selected: isSelected,
-                      selectedColor: AguaTheme.primaryBlue.withValues(alpha: 0.2),
+                      selectedColor: colorScheme.primary.withValues(alpha: 0.2),
                       onSelected: (_) => setState(() => _activityLevel = i),
                     ),
                   ),
@@ -119,28 +113,17 @@ class _HydrationCalculatorState extends State<HydrationCalculator> {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AguaTheme.primaryBlue.withValues(alpha: 0.08),
+                color: colorScheme.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Column(
-                children: [
-                  Text(
-                    'Recomendado: $_recommendedMl ml/dia',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AguaTheme.primaryBlue,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$_recommendedGlasses vasos de ${widget.currentGlassSizeMl} ml',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
+              child: Text(
+                'Recomendado: $_recommendedMl ml/dia',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -149,11 +132,11 @@ class _HydrationCalculatorState extends State<HydrationCalculator> {
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
-                onPressed: () => widget.onApplyGoal(_recommendedGlasses),
+                onPressed: () => widget.onApplyGoal(_recommendedMl),
                 icon: const Icon(Icons.check, size: 18),
                 label: const Text('Aplicar objetivo'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AguaTheme.primaryBlue,
+                  backgroundColor: colorScheme.primary,
                 ),
               ),
             ),

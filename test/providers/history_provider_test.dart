@@ -79,7 +79,7 @@ void main() {
     expect(streak, 3);
   });
 
-  test('averageGlasses computes correctly', () async {
+  test('averageMl computes correctly', () async {
     final now = DateTime.now();
     for (var i = 0; i < 3; i++) {
       final d = now.subtract(Duration(days: i));
@@ -93,8 +93,8 @@ void main() {
       ));
     }
 
-    final avg = await historyService.averageGlasses(7);
-    expect(avg, 6.0);
+    final avg = await historyService.averageMl(7);
+    expect(avg, 1500.0); // 6 glasses * 250ml = 1500ml
   });
 
   test('prune removes old records', () async {

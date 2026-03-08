@@ -1,21 +1,42 @@
 import 'package:flutter/material.dart';
 
+/// Available accent colors for theming.
+class AccentColors {
+  AccentColors._();
+
+  static const colors = [
+    Color(0xFF2196F3), // Blue (default)
+    Color(0xFF4CAF50), // Green
+    Color(0xFF9C27B0), // Purple
+    Color(0xFFFF9800), // Orange
+    Color(0xFFE91E63), // Pink
+    Color(0xFF00BCD4), // Cyan
+  ];
+
+  static const labels = [
+    'Azul',
+    'Verde',
+    'Morado',
+    'Naranja',
+    'Rosa',
+    'Cian',
+  ];
+}
+
 class AguaTheme {
   AguaTheme._();
 
   static const Color primaryBlue = Color(0xFF2196F3);
-  static const Color lightBlue = Color(0xFFBBDEFB);
-  static const Color darkBlue = Color(0xFF1565C0);
   static const Color successGreen = Color(0xFF4CAF50);
   static const Color surfaceLight = Color(0xFFF5F9FF);
   static const Color surfaceDark = Color(0xFF121218);
   static const Color cardDark = Color(0xFF1E1E2A);
   static const Color textPrimary = Color(0xFF1A1A2E);
-  static const Color textSecondary = Color(0xFF6B7280);
 
-  static ThemeData get lightTheme {
+  static ThemeData lightTheme([Color? accent]) {
+    final seed = accent ?? primaryBlue;
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: primaryBlue,
+      seedColor: seed,
       brightness: Brightness.light,
       surface: surfaceLight,
     );
@@ -32,7 +53,7 @@ class AguaTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryBlue,
+          backgroundColor: seed,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
@@ -50,9 +71,10 @@ class AguaTheme {
     );
   }
 
-  static ThemeData get darkTheme {
+  static ThemeData darkTheme([Color? accent]) {
+    final seed = accent ?? primaryBlue;
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: primaryBlue,
+      seedColor: seed,
       brightness: Brightness.dark,
       surface: surfaceDark,
     );
@@ -69,7 +91,7 @@ class AguaTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryBlue,
+          backgroundColor: seed,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(

@@ -38,7 +38,7 @@ class _ProgressCircleState extends State<ProgressCircle>
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.goalMet ? AguaTheme.successGreen : AguaTheme.primaryBlue;
+    final color = widget.goalMet ? AguaTheme.successGreen : Theme.of(context).colorScheme.primary;
 
     return CircularPercentIndicator(
       radius: 110,

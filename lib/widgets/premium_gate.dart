@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../core/theme.dart';
 
 class PremiumGate extends StatelessWidget {
   final String message;
@@ -14,16 +13,16 @@ class PremiumGate extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AguaTheme.primaryBlue.withValues(alpha: 0.1),
-            AguaTheme.darkBlue.withValues(alpha: 0.1),
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AguaTheme.primaryBlue.withValues(alpha: 0.3)),
+        border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
-          const Icon(Icons.lock, color: AguaTheme.primaryBlue, size: 28),
+          Icon(Icons.lock, color: Theme.of(context).colorScheme.primary, size: 28),
           const SizedBox(height: 8),
           Text(
             message,

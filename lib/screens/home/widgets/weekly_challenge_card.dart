@@ -24,15 +24,15 @@ class WeeklyChallengeCard extends StatelessWidget {
                   AguaTheme.successGreen.withValues(alpha: 0.05),
                 ]
               : [
-                  AguaTheme.primaryBlue.withValues(alpha: 0.12),
-                  AguaTheme.primaryBlue.withValues(alpha: 0.04),
+                  colorScheme.primary.withValues(alpha: 0.12),
+                  colorScheme.primary.withValues(alpha: 0.04),
                 ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: completed
               ? AguaTheme.successGreen.withValues(alpha: 0.3)
-              : AguaTheme.primaryBlue.withValues(alpha: 0.2),
+              : colorScheme.primary.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -40,7 +40,7 @@ class WeeklyChallengeCard extends StatelessWidget {
           Icon(
             completed ? Icons.check_circle : challenge.icon,
             size: 32,
-            color: completed ? AguaTheme.successGreen : AguaTheme.primaryBlue,
+            color: completed ? AguaTheme.successGreen : colorScheme.primary,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -84,7 +84,7 @@ class WeeklyChallengeCard extends StatelessWidget {
                     valueColor: AlwaysStoppedAnimation(
                       completed
                           ? AguaTheme.successGreen
-                          : AguaTheme.primaryBlue,
+                          : colorScheme.primary,
                     ),
                   ),
                 ),
@@ -97,7 +97,7 @@ class WeeklyChallengeCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: completed ? AguaTheme.successGreen : AguaTheme.primaryBlue,
+              color: completed ? AguaTheme.successGreen : colorScheme.primary,
             ),
           ),
         ],

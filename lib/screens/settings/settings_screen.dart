@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/water_provider.dart';
 import '../../providers/premium_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/achievements_provider.dart';
 import '../../services/notification_service.dart';
+import '../../services/health_service.dart';
 import 'widgets/goal_picker.dart';
 import 'widgets/reminder_config.dart';
 import 'widgets/premium_card.dart';
 import 'widgets/hydration_calculator.dart';
+import 'widgets/accent_picker.dart';
 import '../../widgets/ad_banner_widget.dart';
 import '../../main.dart';
 
@@ -30,30 +31,16 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Daily goal
+          // Daily goal in ml
           GoalPicker(
-            label: 'Objetivo diario (vasos)',
-            value: settings.dailyGoal,
-            min: 1,
-            max: 20,
+            label: 'Objetivo diario (ml)',
+            value: settings.dailyGoalMl,
+            min: 500,
+            max: 5000,
+            step: 250,
             onChanged: (v) {
-              ref.read(settingsProvider.notifier).setDailyGoal(v);
-              ref.read(waterProvider.notifier).setGoal(v);
-              ref.read(achievementsProvider.notifier).unlockManual('customizer');
-            },
-          ),
-          const SizedBox(height: 16),
-
-          // Glass size
-          GoalPicker(
-            label: 'Tamano del vaso (ml)',
-            value: settings.glassSizeMl,
-            min: 100,
-            max: 500,
-            step: 50,
-            onChanged: (v) {
-              ref.read(settingsProvider.notifier).setGlassSizeMl(v);
-              ref.read(waterProvider.notifier).setGlassSize(v);
+              ref.read(settingsProvider.notifier).setDailyGoalMl(v);
+              ref.read(waterProvider.notifier).setGoalMl(v);
               ref.read(achievementsProvider.notifier).unlockManual('customizer');
             },
           ),
@@ -65,14 +52,13 @@ class SettingsScreen extends ConsumerWidget {
             return HydrationCalculator(
               savedWeightKg: storage.userWeightKg,
               savedActivityLevel: storage.activityLevel,
-              currentGlassSizeMl: settings.glassSizeMl,
-              onApplyGoal: (glasses) {
-                ref.read(settingsProvider.notifier).setDailyGoal(glasses);
-                ref.read(waterProvider.notifier).setGoal(glasses);
+              onApplyGoal: (ml) {
+                ref.read(settingsProvider.notifier).setDailyGoalMl(ml);
+                ref.read(waterProvider.notifier).setGoalMl(ml);
                 ref.read(achievementsProvider.notifier).unlockManual('customizer');
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Objetivo actualizado a $glasses vasos'),
+                    content: Text('Objetivo actualizado a $ml ml'),
                     duration: const Duration(seconds: 2),
                   ),
                 );
@@ -90,12 +76,47 @@ class SettingsScreen extends ConsumerWidget {
               ),
               secondary: Icon(
                 isDark ? Icons.dark_mode : Icons.light_mode,
-                color: AguaTheme.primaryBlue,
+                color: Theme.of(context).colorScheme.primary,
               ),
               value: isDark,
               onChanged: (_) => ref.read(themeProvider.notifier).toggle(),
-              activeColor: AguaTheme.primaryBlue,
+              activeColor: Theme.of(context).colorScheme.primary,
             ),
+          ),
+          const SizedBox(height: 16),
+
+          // Sound toggle
+          Builder(builder: (context) {
+            final storage = ref.read(storageServiceProvider);
+            final soundOn = storage.soundEnabled;
+            return Card(
+              child: SwitchListTile(
+                title: const Text(
+                  'Sonido al beber',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                secondary: Icon(
+                  soundOn ? Icons.volume_up : Icons.volume_off,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                value: soundOn,
+                onChanged: (v) {
+                  storage.setSoundEnabled(v);
+                  (context as Element).markNeedsBuild();
+                },
+                activeColor: Theme.of(context).colorScheme.primary,
+              ),
+            );
+          }),
+          const SizedBox(height: 16),
+
+          // Accent color picker
+          AccentPicker(
+            selectedIndex: ref.watch(accentProvider),
+            isPremium: isPremium,
+            onChanged: (index) {
+              ref.read(accentProvider.notifier).setIndex(index);
+            },
           ),
           const SizedBox(height: 24),
 
@@ -132,6 +153,36 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
+          // Health Connect
+          Builder(builder: (context) {
+            final storage = ref.read(storageServiceProvider);
+            final healthOn = storage.healthConnectEnabled;
+            return Card(
+              child: SwitchListTile(
+                title: const Text(
+                  'Health Connect',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: const Text('Sincronizar con Google Fit'),
+                secondary: Icon(
+                  Icons.favorite,
+                  color: healthOn ? Colors.red : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                value: healthOn,
+                onChanged: (v) async {
+                  if (v) {
+                    final granted = await HealthService.requestPermissions();
+                    if (!granted) return;
+                  }
+                  await storage.setHealthConnectEnabled(v);
+                  (context as Element).markNeedsBuild();
+                },
+                activeColor: Theme.of(context).colorScheme.primary,
+              ),
+            );
+          }),
+          const SizedBox(height: 24),
+
           // Premium
           PremiumCard(isPremium: isPremium),
 
@@ -139,7 +190,7 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           Card(
             child: ListTile(
-              leading: const Icon(Icons.privacy_tip, color: AguaTheme.primaryBlue),
+              leading: Icon(Icons.privacy_tip, color: Theme.of(context).colorScheme.primary),
               title: const Text('Politica de privacidad'),
               trailing: const Icon(Icons.open_in_new, size: 18),
               onTap: () {

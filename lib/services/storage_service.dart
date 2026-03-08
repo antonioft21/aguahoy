@@ -146,12 +146,59 @@ class StorageService {
     await _prefs.setInt(SPKeys.activityLevel, level);
   }
 
+  // --- Accent color ---
+
+  int get accentColorIndex => _prefs.getInt(SPKeys.accentColorIndex) ?? 0;
+
+  Future<void> setAccentColorIndex(int index) async {
+    await _prefs.setInt(SPKeys.accentColorIndex, index);
+  }
+
+  // --- Sound ---
+
+  bool get soundEnabled => _prefs.getBool(SPKeys.soundEnabled) ?? true;
+
+  Future<void> setSoundEnabled(bool value) async {
+    await _prefs.setBool(SPKeys.soundEnabled, value);
+  }
+
+  // --- Health Connect ---
+
+  bool get healthConnectEnabled =>
+      _prefs.getBool(SPKeys.healthConnectEnabled) ?? false;
+
+  Future<void> setHealthConnectEnabled(bool value) async {
+    await _prefs.setBool(SPKeys.healthConnectEnabled, value);
+  }
+
   // --- Generic access ---
 
   bool? getBool(String key) => _prefs.getBool(key);
 
   Future<void> setBool(String key, bool value) async {
     await _prefs.setBool(key, value);
+  }
+
+  // --- Today entries (JSON list) ---
+
+  String? get todayEntriesRaw => _prefs.getString(SPKeys.todayEntries);
+
+  Future<void> setTodayEntries(String json) async {
+    await _prefs.setString(SPKeys.todayEntries, json);
+  }
+
+  // --- Daily goal in ml ---
+
+  /// Returns the goal in ml. Migrates from legacy format if needed.
+  int get dailyGoalMl {
+    final saved = _prefs.getInt(SPKeys.dailyGoalMl);
+    if (saved != null) return saved;
+    // Migrate from legacy: dailyGoal (glasses) * glassSizeMl
+    return dailyGoal * glassSizeMl;
+  }
+
+  Future<void> setDailyGoalMl(int ml) async {
+    await _prefs.setInt(SPKeys.dailyGoalMl, ml);
   }
 
   // --- Daily reset check ---
